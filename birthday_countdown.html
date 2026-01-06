@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Countdown Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        #timer {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .pinwall, .poll, .upload {
+            margin-bottom: 20px;
+        }
+        .pinwall textarea, .poll select, .upload input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .pinwall button, .poll button, .upload button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff6347;
+            color: white;
+            cursor: pointer;
+        }
+        .pinwall button:hover, .poll button:hover, .upload button:hover {
+            background-color: #ff4500;
+        }
+        .messages, .results, .gallery {
+            margin-top: 20px;
+        }
+        .gallery img {
+            max-width: 100px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Birthday Countdown Timer 🎉</h1>
+        <div id="timer">Time left until the big day!</div>
+
+        <div class="pinwall">
+            <h2>📌 Pinwall 📌</h2>
+            <textarea placeholder="Leave a message for [birthday child]"></textarea><br>
+            <button onclick="addMessage()">Add Message</button>
+            <div class="messages" id="messages"></div>
+        </div>
+
+        <div class="poll">
+            <h2>🗳 Poll 🗳</h2>
+            <select id="pollSelect">
+                <option value="funny">Funny</option>
+                <option value="kind">Kind</option>
+                <option value="smart">Smart</option>
+            </select><br>
+            <button onclick="vote()">Vote</button>
+            <div class="results" id="results"></div>
+        </div>
+
+        <div class="upload">
+            <h2>📸 Upload a Picture 📸</h2>
+            <input type="file" id="fileInput" accept="image/*"><br>
+            <button onclick="uploadPicture()">Upload</button>
+            <div class="gallery" id="gallery"></div>
+        </div>
+    </div>
+
+    <script>
+        // Countdown Timer
+        function updateTimer() {
+            const targetDate = new Date('2030-01-01T00:00:00Z').getTime();
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('timer').innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer').innerHTML = "It's the big day!";
+            }
+        }
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        // Pinwall
+        function addMessage() {
+            const message = document.querySelector('.pinwall textarea').value;
+            if (message.trim() !== '') {
+                const messagesDiv = document.getElementById('messages');
+                const messageElem = document.createElement('div');
+                messageElem.innerText = message;
+                messagesDiv.appendChild(messageElem);
+                document.querySelector('.pinwall textarea').value = '';
+            }
+        }
+
+        // Poll
+        const pollResults = {};
+        function vote() {
+            const vote = document.getElementById('pollSelect').value;
+            pollResults[vote] = (pollResults[vote] || 0) + 1;
+            updatePollResults();
+        }
+
+        function updatePollResults() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            for (const [key, value] of Object.entries(pollResults)) {
+                const resultElem = document.createElement('div');
+                resultElem.innerText = `${key}: ${value}`;
+                resultsDiv.appendChild(resultElem);
+            }
+        }
+
+        // Picture Upload
+        function uploadPicture() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElem = document.createElement('img');
+                    imgElem.src = e.target.result;
+                    document.getElementById('gallery').appendChild(imgElem);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>
